@@ -25,9 +25,9 @@ public class GuardService extends Service {
         //startForeground(GuardId, new Notification());//提高优先级不能写写了用户可能在notifycation中将其关闭掉
         //绑定链接
         bindService(new Intent(GuardService.this, MessageService.class), mServiceConnection, Context.BIND_IMPORTANT);
-//        Intent messageIntent = new Intent(GuardService.this, MessageService.class);
-//        // 发现断开我就从新启动和绑定
-//        startService(messageIntent);
+        Intent messageIntent = new Intent(GuardService.this, MessageService.class);
+        // 发现断开我就从新启动和绑定
+        startService(messageIntent);
         return START_STICKY;
     }
 
@@ -36,8 +36,7 @@ public class GuardService extends Service {
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
         return mGuardBind ;
-        //        return new ProcessConnection.Stub() {
-//        };//进程间通信
+
     }
     private class GuardBind extends ProcessConnection.Stub {
 
