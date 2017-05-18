@@ -59,7 +59,6 @@ public class GuardService extends Service {
         Log.d(TAG, "onDestroy: ");
     }
 
-//    private ServiceConnection mServiceConnection = new ServiceConnection() {
         private class MessageServiceConnection implements ServiceConnection {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
