@@ -1,5 +1,6 @@
 package com.gogogo.aliveservice;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -15,63 +16,44 @@ import android.widget.Toast;
  */
 public class GuardService extends Service {
     private static final String TAG = "GuardService";
-    private final int GuardId = 1;
-    private GuardBind mGuardBind;
-    private MessageServiceConnection mServiceConnection;
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(TAG, "onStartCommand: ");
-        //startForeground(GuardId, new Notification());//提高优先级不能写写了用户可能在notifycation中将其关闭掉
-        //绑定链接
-        bindService(new Intent(GuardService.this, MessageService.class), mServiceConnection, Context.BIND_IMPORTANT);
-        Intent messageIntent = new Intent(GuardService.this, MessageService.class);
-        // 发现断开我就从新启动和绑定
-        startService(messageIntent);
-        return START_STICKY;
-    }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
-        return mGuardBind ;
-
+        return new ProcessConnection.Stub(){};
     }
-    private class GuardBind extends ProcessConnection.Stub {
 
-    }
+
+
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d(TAG, "onCreate: ");
-        if (mServiceConnection == null) {
-            mServiceConnection = new GuardService.MessageServiceConnection();
-        }
-        if (mGuardBind == null){
-            mGuardBind = new GuardService.GuardBind();
-        }
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(TAG, "onStartCommand: ");
+        startForeground(1, new Notification());//优先级
+        bindService(new Intent(this, MessageService.class), mServiceConnection, Context.BIND_IMPORTANT);//绑定
+        return START_STICKY;
     }
 
 
-        private class MessageServiceConnection implements ServiceConnection {
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d(TAG, "onServiceConnected: ");
-            // 建立连接
-            Toast.makeText(GuardService.this, "建立连接GuardService", Toast.LENGTH_LONG).show();
-            Intent messageIntent = new Intent(GuardService.this, MessageService.class);
-            startService(messageIntent);//开启工作service
+            //连接上
+            Toast.makeText(GuardService.this, "GuardService建立连接",  Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public void onServiceDisconnected(ComponentName name) {//断开连接,重新启动绑定
-            Log.d(TAG, "onServiceDisconnected: ");
-            Toast.makeText(GuardService.this, "断开连接GuardService", Toast.LENGTH_LONG).show();
-            Intent messageIntent = new Intent(GuardService.this, MessageService.class);
-            // 发现断开我就从新启动和绑定
-            startService(messageIntent);
-            GuardService.this.bindService(messageIntent, mServiceConnection, Context.BIND_IMPORTANT);
+        public void onServiceDisconnected(ComponentName name) {
+            //断开
+            Toast.makeText(GuardService.this, "GuardService断开连接", Toast.LENGTH_SHORT).show();
+            startService(new Intent(GuardService.this, MessageService.class));
+            bindService(new Intent(GuardService.this, MessageService.class), mServiceConnection, Context.BIND_IMPORTANT);//绑定
         }
     };
     @Override
