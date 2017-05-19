@@ -45,6 +45,8 @@ public class MessageService extends Service {
                 }
             }
         }).start();
+
+
     }
 
     @Override
