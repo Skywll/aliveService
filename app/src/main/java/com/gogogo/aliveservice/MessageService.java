@@ -82,4 +82,11 @@ public class MessageService extends Service {
             MessageService.this.bindService(guardIntent, mServiceConnection, Context.BIND_IMPORTANT);
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        unbindService(mServiceConnection);
+    }
 }

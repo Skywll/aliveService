@@ -53,11 +53,6 @@ public class GuardService extends Service {
         }
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy: ");
-    }
 
         private class MessageServiceConnection implements ServiceConnection {
         @Override
@@ -79,4 +74,10 @@ public class GuardService extends Service {
             GuardService.this.bindService(messageIntent, mServiceConnection, Context.BIND_IMPORTANT);
         }
     };
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy: ");
+        unbindService(mServiceConnection);
+    }
 }
